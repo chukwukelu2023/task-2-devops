@@ -8,7 +8,7 @@ logPath="/var/log/user_management.log"
 # Check if the file exists
 
 if [[ ! -f "$CSV_FILE" ]]; then 
-	echo "File not found!" >> $logPath
+	echo "$(date "+%Y-%m-%d %H:%M:%S") File not found!" >> $logPath
 	echo "File not found!"
 	exit 1
 
@@ -16,7 +16,7 @@ fi
 
 # check if file is a csv file
 if [[ "$CSV_FILE" != *.csv ]]; then 
-	echo "File must have .csv extension"  >> $logPath
+	echo "$(date "+%Y-%m-%d %H:%M:%S") File must have .csv extension"  >> $logPath
 	echo "File must have .csv extension"
 	exit 1
 fi
