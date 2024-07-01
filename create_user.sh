@@ -33,7 +33,7 @@ while IFS=';' read -r user groups; do
 	groups=$(echo $groups | tr -d ' ')
 
 if id $user &>/dev/null; then
-                echo "$(date "+%Y-%m-%d %H:%M:%S") user $user already exist."
+                echo "$(date "+%Y-%m-%d %H:%M:%S") user $user already exist." >> $logPath
  
         else
                 password=$(tr -dc 'A-Za-z0-9!?%#&' < /dev/urandom | head -c 12)
@@ -42,7 +42,6 @@ if id $user &>/dev/null; then
                 echo "$user:$password" | chpasswd
                 echo "$user,$password" >> /var/$passwdir/$passwfile
                 echo "$(date "+%Y-%m-%d %H:%M:%S") created user with username: $user by user $(whoami)" >> $logPath
-                echo "$user:$password"
         fi
 
 # Split the groups by comma and add user to each group
