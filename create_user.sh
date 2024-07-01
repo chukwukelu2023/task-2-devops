@@ -2,9 +2,13 @@
 
 CSV_FILE="$1"
 
+logPath="/var/log/user_management.log"
+# Read the CSV files line by line
+
 # Check if the file exists
 
 if [[ ! -f "$CSV_FILE" ]]; then 
+	echo "File not found!" >> $logPath
 	echo "File not found!"
 	exit 1
 
@@ -12,6 +16,7 @@ fi
 
 # check if file is a csv file
 if [[ "$CSV_FILE" != *.csv ]]; then 
+	echo "File must have .csv extension"  >> $logPath
 	echo "File must have .csv extension"
 	exit 1
 fi
@@ -25,31 +30,37 @@ if [ ! -d /var/$passwdir ]; then
 	chmod 600 /var/$passwdir/$passwfile
 fi
 
-logPath="/var/log/user_management.log"
-# Read the CSV files line by line
 
+# Split the user and group by ";"
 while IFS=';' read -r user groups; do
 	user=$(echo $user | tr -d ' ')
 	groups=$(echo $groups | tr -d ' ')
-
+# Check if the user is existing or not
 if id $user &>/dev/null; then
-                echo "$(date "+%Y-%m-%d %H:%M:%S") user $user already exist." >> $logPath
+				# Created a log that user exits in /var/secure/user_management.txt
+                echo "$(date "+%Y-%m-%d %H:%M:%S") user with username $user already exist." >> $logPath
  
         else
+				# Generate random Password
                 password=$(tr -dc 'A-Za-z0-9!?%#&' < /dev/urandom | head -c 12)
  
+				# Created User and Assign password
                 useradd -m $user
                 echo "$user:$password" | chpasswd
+				# Store the created user and password to /var/secure/user_passwords.csv
                 echo "$user,$password" >> /var/$passwdir/$passwfile
-                echo "$(date "+%Y-%m-%d %H:%M:%S") created user with username: $user by user $(whoami)" >> $logPath
+
+				# Logs that a new user is cretaed to /var/secure/user_management.txt
+                echo "$(date "+%Y-%m-%d %H:%M:%S") user with username: $user cretaed by user $(whoami)" >> $logPath
         fi
 
 # Split the groups by comma and add user to each group
 IFS=',' read -ra GROUP_ARRAY <<< "$groups"
 
+#Loop through the array of groups
 for group in "${GROUP_ARRAY[@]}"; do
 
-	echo "$(date "+%Y-%m-%d %H:%M:%S") Added user: $user to group :$group by user $(whoami)" >> $logPath
+	echo "$(date "+%Y-%m-%d %H:%M:%S") user with username: $user added to group :$group by user $(whoami)" >> $logPath
 
 done
 
