@@ -24,7 +24,6 @@ if [ ! -d /var/$passwdir ]; then
 	# Set permission of the file
 	chmod 600 /var/$passwdir/$passwfile
 fi
-# Set permission of the 
 
 logPath="/var/log/user_management.log"
 # Read the CSV files line by line
@@ -32,26 +31,26 @@ logPath="/var/log/user_management.log"
 while IFS=';' read -r user groups; do
 	user=$(echo $user | tr -d ' ')
 	groups=$(echo $groups | tr -d ' ')
-	checkuser=$(grep $user /etc/passwd)
-	if [ -z $checkuser ]; then
-		password=$(tr -dc 'A-Za-z0-9!?%#&' < /dev/urandom | head -c 12)
-	
-		useradd -m $user
-		echo "$user:$password" | chpasswd
-		echo "$user,$password" >> /var/$passwdir/$passwfile
 
-		echo "$(date) created user with username: $user by user $(whoami)" >> $logPath
-else
-	echo "$(date) user: $user already exist" >> $logPath
-	fi
-
+if id $user &>/dev/null; then
+                echo "$(date "+%Y-%m-%d %H:%M:%S") user $user already exist."
+ 
+        else
+                password=$(tr -dc 'A-Za-z0-9!?%#&' < /dev/urandom | head -c 12)
+ 
+                useradd -m $user
+                echo "$user:$password" | chpasswd
+                echo "$user,$password" >> /var/$passwdir/$passwfile
+                echo "$(date "+%Y-%m-%d %H:%M:%S") created user with username: $user by user $(whoami)" >> $logPath
+                echo "$user:$password"
+        fi
 
 # Split the groups by comma and add user to each group
 IFS=',' read -ra GROUP_ARRAY <<< "$groups"
 
 for group in "${GROUP_ARRAY[@]}"; do
 
-	echo "$(date) Added user: $user to group :$group by user $(whoami)" >> $logPath
+	echo "$(date "+%Y-%m-%d %H:%M:%S") Added user: $user to group :$group by user $(whoami)" >> $logPath
 
 done
 
