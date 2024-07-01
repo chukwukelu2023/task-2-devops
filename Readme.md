@@ -101,10 +101,10 @@ To run the script, follow these steps:
     peter;operations
     ```
 
-4. Execute the script with the CSV file as an argument:
+4. Execute the script as shown add **sudo** if you are not a root user:
 
     ```bash
-    sudo ./create_users.sh users.csv
+    bash create_users.sh users.csv
     ```
 
 After running the script, new users will be created, and their details will be stored in `/var/secure/user_passwords.csv`. All actions will be logged in `/var/secure/user_management.txt`.
