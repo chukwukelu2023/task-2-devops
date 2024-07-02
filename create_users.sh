@@ -59,8 +59,15 @@ IFS=',' read -ra GROUP_ARRAY <<< "$groups"
 
 #Loop through the array of groups
 for group in "${GROUP_ARRAY[@]}"; do
-
-	echo "$(date "+%Y-%m-%d %H:%M:%S") user with username: $user added to group :$group by user $(whoami)" >> $logPath
+		# check for the existense of group before adding users to group
+		 if [ $(getent group $group) ]; then
+		 	echo "$(date "+%Y-%m-%d %H:%M:%S") group: $group already exists." >> $logPath
+		 else
+		 	groupadd $group
+		 	echo "$(date "+%Y-%m-%d %H:%M:%S") group: $group created by user $(whoami)." 
+		fi
+	adduser $user $group
+	echo "$(date "+%Y-%m-%d %H:%M:%S") user with username: $user was added to group :$group by user $(whoami)" >> $logPath
 
 done
 
