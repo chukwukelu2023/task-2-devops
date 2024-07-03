@@ -22,12 +22,6 @@ if [[ ! -f "$CSV_FILE" ]]; then
     echo "File not found!"
     exit 1
 fi
-
-# Check if the file has a .csv extension
-if [[ "$CSV_FILE" != *.csv ]]; then
-    echo "File must have a .csv extension"
-    exit 1
-fi
 ```
 
 ### Creating a Directory and File to Store Users
@@ -76,8 +70,22 @@ while IFS=';' read -r user groups; do
     # Split the groups by comma and add user to each group
     IFS=',' read -ra GROUP_ARRAY <<< "$groups"
     for group in "${GROUP_ARRAY[@]}"; do
-        usermod -aG "$group" "$user"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") user with username: $user added to group :$group by user $(whoami)" >> $logPath
+        # check for the existense of group before creating group
+		 if [ $(getent group $group) ]; then
+		 	echo "$(date "+%Y-%m-%d %H:%M:%S") group: $group already exists." >> $logPath
+		 else
+		 	groupadd $group
+		 	echo "$(date "+%Y-%m-%d %H:%M:%S") group: $group created by user $(whoami)."  >> $logPath
+		fi
+
+		# check for the existense of user in a group before addding the user
+		if getent group "$group" | grep -qw "$user"; then
+			echo "$(date "+%Y-%m-%d %H:%M:%S") user: $user is already in group: $group"  >> $logPath
+		else
+			adduser $user $group
+			echo "$(date "+%Y-%m-%d %H:%M:%S") user with username: $user was added to group :$group by user $(whoami)" >> $logPath
+		fi
+
     done
 
 done < "$CSV_FILE"

@@ -3,7 +3,7 @@
 CSV_FILE="$1"
 
 logPath="/var/log/user_management.log"
-# Read the CSV files line by line
+# Read the files line by line
 
 # Check if the file exists
 
@@ -12,13 +12,6 @@ if [[ ! -f "$CSV_FILE" ]]; then
 	echo "File not found!"
 	exit 1
 
-fi
-
-# check if file is a csv file
-if [[ "$CSV_FILE" != *.csv ]]; then 
-	echo "$(date "+%Y-%m-%d %H:%M:%S") File must have .csv extension"  >> $logPath
-	echo "File must have .csv extension"
-	exit 1
 fi
 # check if directories exist if not create it
 passwdir='secure'
